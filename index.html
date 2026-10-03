@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Śrī Rāma Rakṣā Stotram — Meaning</title>
+
+<style>
+
+
+:root {
+    --bg: #faf7f2;
+    --card: #ffffff;
+    --text: #29231d;
+    --muted: #756b60;
+    --accent: #8b4513;
+    --accent-light: #f3e4d2;
+    --border: #e2d7ca;
+    --sanskrit-bg: #fff9ef;
+    --meaning-bg: #f7f7f5;
+    --understanding-bg: #fffaf5;
+    --button-bg: #ffffff;
+    --table-bg: #ffffff;
+    --sticky-bg: rgba(250,247,242,.96);
+    --simple-border: #c9a77c;
+    --detail-border: #a98c70;
+    --on-accent: #ffffff;
+}
+
+:root[data-theme="dark"] {
+    --bg: #17130f;
+    --card: #221c16;
+    --text: #ece4da;
+    --muted: #a99d8f;
+    --accent: #e0a064;
+    --accent-light: #3a2c1f;
+    --border: #4a3d31;
+    --sanskrit-bg: #2b231a;
+    --meaning-bg: #2a241e;
+    --understanding-bg: #292119;
+    --button-bg: #2b241d;
+    --table-bg: #221c16;
+    --sticky-bg: rgba(23,19,15,.96);
+    --simple-border: #7d6342;
+    --detail-border: #6e5a46;
+    --on-accent: #1b140d;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+
+    font-family:
+        "Noto Sans",
+        "Noto Sans Telugu",
+        "Noto Serif Telugu",
+        Georgia,
+        serif;
+
+    line-height: 1.75;
+}
+
+.container {
+    max-width: 1050px;
+    margin: auto;
+    padding: 30px 18px 70px;
+}
+
+/* -------------------------------------------------
+   HEADER
+------------------------------------------------- */
+
+header {
+    text-align: center;
+    padding: 35px 20px 25px;
+}
+
+h1 {
+    margin: 0;
+    color: var(--accent);
+    font-size: clamp(28px, 5vw, 46px);
+}
+
+.subtitle {
+    color: var(--muted);
+    font-size: 17px;
+    margin-top: 10px;
+}
+
+/* -------------------------------------------------
+   GLOBAL CONTROLS
+------------------------------------------------- */
+
+.global-controls {
+    position: sticky;
+    top: 0;
+
+    z-index: 20;
+
+    background: var(--sticky-bg);
+    backdrop-filter: blur(8px);
+
+    padding: 12px 0;
+
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+button {
+    border: 1px solid var(--border);
+
+    background: var(--button-bg);
+    color: var(--text);
+
+    border-radius: 9px;
+
+    padding: 9px 14px;
+
+    cursor: pointer;
+
+    font-size: 14px;
+
+    transition: .15s ease;
+}
+
+button:hover {
+    background: var(--accent-light);
+}
+
+button.active {
+    background: var(--accent);
+    color: var(--on-accent);
+    border-color: var(--accent);
+}
+
+/* -------------------------------------------------
+   VERSE CARD
+------------------------------------------------- */
+
+.verse {
+    background: var(--card);
+
+    border: 1px solid var(--border);
+    border-radius: 16px;
+
+    margin: 18px 0;
+
+    overflow: hidden;
+}
+
+/* -------------------------------------------------
+   VERSE HEADER
+------------------------------------------------- */
+
+.verse-header {
+    padding: 15px 20px;
+
+    background: var(--accent-light);
+
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+}
+
+.verse-number {
+    font-weight: bold;
+    color: var(--accent);
+    font-size: 18px;
+
+    white-space: nowrap;
+}
+
+.verse-title {
+    flex: 1;
+
+    font-weight: bold;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* -------------------------------------------------
+   ORIGINAL
+------------------------------------------------- */
+
+.original-section {
+    padding: 20px;
+}
+
+.section-title {
+    color: var(--accent);
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+    margin-bottom: 10px;
+}
+
+.sanskrit {
+    background: var(--sanskrit-bg);
+
+    border-left: 4px solid var(--accent);
+
+    border-radius: 8px;
+
+    padding: 16px 18px;
+
+    font-size: 21px;
+
+    line-height: 2;
+
+    margin-bottom: 15px;
+}
+
+/* -------------------------------------------------
+   VERSE TOGGLE BUTTONS
+------------------------------------------------- */
+
+.verse-buttons {
+    display: flex;
+
+    gap: 10px;
+
+    flex-wrap: wrap;
+
+    padding: 0 20px 20px;
+}
+
+.verse-buttons button {
+    font-size: 14px;
+}
+
+.verse-buttons .simple-button {
+    border-color: var(--simple-border);
+}
+
+.verse-buttons .detail-button {
+    border-color: var(--detail-border);
+}
+
+/* -------------------------------------------------
+   TOGGLEABLE CONTENT
+------------------------------------------------- */
+
+.toggle-section {
+    display: none;
+
+    padding: 0 20px 20px;
+}
+
+.toggle-section.visible {
+    display: block;
+}
+
+/* -------------------------------------------------
+   SIMPLE MEANING
+------------------------------------------------- */
+
+.simple-meaning {
+    background: var(--meaning-bg);
+
+    border-radius: 10px;
+
+    padding: 16px 18px;
+
+    font-size: 18px;
+}
+
+/* -------------------------------------------------
+   UNDERSTANDING
+------------------------------------------------- */
+
+.understanding {
+    background: var(--understanding-bg);
+
+    border-radius: 10px;
+
+    padding: 16px 18px;
+
+    border: 1px solid var(--border);
+
+    margin-bottom: 20px;
+}
+
+/* -------------------------------------------------
+   WORD TABLE
+------------------------------------------------- */
+
+.word-table {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    margin: 10px 0 0;
+
+    background: var(--table-bg);
+}
+
+.word-table th,
+.word-table td {
+    border: 1px solid var(--border);
+
+    padding: 10px 12px;
+
+    vertical-align: top;
+
+    text-align: left;
+}
+
+.word-table th {
+    background: var(--accent-light);
+
+    color: var(--accent);
+}
+
+.sanskrit-word {
+    font-weight: bold;
+
+    font-size: 18px;
+}
+
+/* -------------------------------------------------
+   FOOTER
+------------------------------------------------- */
+
+footer {
+    text-align: center;
+
+    color: var(--muted);
+
+    padding: 40px 10px;
+}
+
+/* -------------------------------------------------
+   MOBILE
+------------------------------------------------- */
+
+@media (max-width: 650px) {
+
+    .verse-header {
+        flex-direction: column;
+
+        align-items: flex-start;
+    }
+
+    .verse-title {
+        white-space: normal;
+    }
+
+    .sanskrit {
+        font-size: 18px;
+    }
+
+    .word-table,
+    .word-table thead,
+    .word-table tbody,
+    .word-table th,
+    .word-table td,
+    .word-table tr {
+        display: block;
+    }
+
+    .word-table thead {
+        display: none;
+    }
+
+    .word-table tr {
+        border: 1px solid var(--border);
+
+        margin-bottom: 10px;
+
+        border-radius: 8px;
+
+        overflow: hidden;
+    }
+
+    .word-table td {
+        border: none;
+
+        border-bottom: 1px solid var(--border);
+    }
+
+    .word-table td:last-child {
+        border-bottom: none;
+    }
+}
+
+
+</style>
+</head>
+
+
+<body>
+
+<div class="theme-bar">
+    <button id="theme-toggle" class="theme-toggle" type="button"></button>
+</div>
+
+<div class="container">
+
+<header>
+
+    <h1 id="page-heading"></h1>
+
+    <div class="subtitle" id="page-subtitle"></div>
+
+</header>
+
+
+<div class="global-controls">
+
+    <button id="btn-show-simple" onclick="showAllSimple()"></button>
+
+    <button id="btn-hide-simple" onclick="hideAllSimple()"></button>
+
+    <button id="btn-show-detailed" onclick="showAllDetailed()"></button>
+
+    <button id="btn-hide-detailed" onclick="hideAllDetailed()"></button>
+
+</div>
+
+
+<div id="verses"></div>
+
+
+<footer id="page-footer"></footer>
+
+</div>
+
+
+<script>
+
+/*
+=========================================================
+  All page content (verses, meanings, labels, header and
+  footer text) lives in rama_raksha_stotram.json.
+  This script only loads that file and renders the page.
+
+  NOTE: browsers block fetch() on file:// pages. Serve the
+  folder over HTTP, e.g.  python -m http.server
+=========================================================
+*/
+
+const DATA_URL = "rama_raksha_stotram.json";
+
+let verses = [];
+let ui = {};
+
+
+/*
+=========================================================
+  THEME (DARK / LIGHT)
+=========================================================
+*/
+
+function getInitialTheme() {
+
+    try {
+        const saved = localStorage.getItem("theme");
+        if (saved === "dark" || saved === "light") return saved;
+    } catch (e) {}
+
+    return window.matchMedia &&
+           window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+}
+
+function applyTheme(theme) {
+
+    document.documentElement.setAttribute("data-theme", theme);
+
+    const toggle = document.getElementById("theme-toggle");
+
+    /* Button offers the mode you can switch TO. */
+    toggle.textContent = theme === "dark"
+        ? "☀ " + (ui.lightMode || "Light Mode")
+        : "🌙 " + (ui.darkMode || "Dark Mode");
+
+    try { localStorage.setItem("theme", theme); } catch (e) {}
+}
+
+function toggleTheme() {
+
+    const current = document.documentElement.getAttribute("data-theme");
+
+    applyTheme(current === "dark" ? "light" : "dark");
+}
+
+applyTheme(getInitialTheme());
+
+document.getElementById("theme-toggle")
+    .addEventListener("click", toggleTheme);
+
+
+/*
+=========================================================
+  LOAD DATA
+=========================================================
+*/
+
+async function loadData() {
+
+    try {
+
+        const response = await fetch(DATA_URL);
+
+        if (!response.ok) throw new Error("HTTP " + response.status);
+
+        const data = await response.json();
+
+        ui = data.ui || {};
+        verses = data.verses || [];
+
+        renderPage(data.meta || {});
+
+    } catch (error) {
+
+        const box = document.getElementById("verses");
+
+        box.innerHTML = '<div class="load-error"></div>';
+
+        box.firstChild.textContent =
+            "Could not load " + DATA_URL + " (" + error.message + "). " +
+            "Open this page through a web server instead of file://.";
+    }
+}
+
+function renderPage(meta) {
+
+    if (meta.pageTitle) document.title = meta.pageTitle;
+
+    document.getElementById("page-heading").textContent = meta.heading || "";
+
+    document.getElementById("page-subtitle").textContent = meta.subtitle || "";
+
+    document.getElementById("btn-show-simple").textContent = ui.showAllSimple;
+    document.getElementById("btn-hide-simple").textContent = ui.hideAllSimple;
+    document.getElementById("btn-show-detailed").textContent = ui.showAllDetailed;
+    document.getElementById("btn-hide-detailed").textContent = ui.hideAllDetailed;
+
+    document.getElementById("page-footer").innerHTML =
+        (meta.footer || []).map(line => "<div>" + line + "</div>").join("");
+
+    applyTheme(document.documentElement.getAttribute("data-theme"));
+
+    renderVerses();
+}
+
+
+/*
+=========================================================
+  RENDER VERSES
+=========================================================
+*/
+
+function renderVerses() {
+
+    const container = document.getElementById("verses");
+
+    container.innerHTML = "";
+
+    verses.forEach(verse => {
+
+        const hasSimple = !!verse.simple;
+
+        const hasDetail = !!verse.deep || !!(verse.words && verse.words.length);
+
+        const verseCard = document.createElement("article");
+
+        verseCard.className = "verse";
+
+        /*
+         * VERSE HEADER
+         */
+
+        const header = document.createElement("div");
+
+        header.className = "verse-header";
+
+        header.innerHTML = `
+
+            <span class="verse-number">
+                ${
+                    typeof verse.number === "number"
+                    ? ui.verseLabel + " " + verse.number
+                    : verse.number
+                }
+            </span>
+
+            <span class="verse-title">
+                ${getShortTitle(verse)}
+            </span>
+
+        `;
+
+
+        /*
+         * ORIGINAL SECTION
+         */
+
+        const originalSection = document.createElement("div");
+
+        originalSection.className = "original-section";
+
+        originalSection.innerHTML = `
+
+            <div class="section-title">
+                ${ui.originalTitle}
+            </div>
+
+            <div class="sanskrit">
+                ${verse.text.replace(/\n/g, "<br>")}
+            </div>
+
+        `;
+
+        verseCard.appendChild(header);
+
+        verseCard.appendChild(originalSection);
+
+
+        /*
+         * TWO BUTTONS + TOGGLE SECTIONS
+         * (only created for the parts the verse has data for)
+         */
+
+        const buttons = document.createElement("div");
+
+        buttons.className = "verse-buttons";
+
+        let simpleSection = null;
+        let detailSection = null;
+
+        if (hasSimple) {
+
+            const simpleButton = document.createElement("button");
+
+            simpleButton.className = "simple-button";
+
+            simpleButton.textContent = ui.showSimple;
+
+            simpleSection = document.createElement("div");
+
+            simpleSection.className = "toggle-section simple-section";
+
+            simpleSection.innerHTML = `
+
+                <div class="section-title">
+                    ${ui.simpleTitle}
+                </div>
+
+                <div class="simple-meaning">
+                    ${verse.simple}
+                </div>
+
+            `;
+
+            simpleButton.addEventListener("click", () => {
+
+                setSimple(simpleSection, simpleButton,
+                    !simpleSection.classList.contains("visible"));
+
+            });
+
+            buttons.appendChild(simpleButton);
+        }
+
+        if (hasDetail) {
+
+            const detailButton = document.createElement("button");
+
+            detailButton.className = "detail-button";
+
+            detailButton.textContent = ui.showDetail;
+
+            detailSection = document.createElement("div");
+
+            detailSection.className = "toggle-section detail-section";
+
+            /*
+             * Order is: Understanding, then Word-by-Word
+             */
+
+            detailSection.innerHTML =
+
+                (verse.deep ? `
+
+                    <div class="section-title">
+                        ${ui.understandingTitle}
+                    </div>
+
+                    <div class="understanding">
+                        ${verse.deep}
+                    </div>
+
+                ` : "") +
+
+                (verse.words && verse.words.length ? `
+
+                    <div class="section-title">
+                        ${ui.wordsTitle}
+                    </div>
+
+                    ${createWordTable(verse.words)}
+
+                ` : "");
+
+            detailButton.addEventListener("click", () => {
+
+                setDetail(detailSection, detailButton,
+                    !detailSection.classList.contains("visible"));
+
+            });
+
+            buttons.appendChild(detailButton);
+        }
+
+        if (buttons.children.length) verseCard.appendChild(buttons);
+
+        if (simpleSection) verseCard.appendChild(simpleSection);
+
+        if (detailSection) verseCard.appendChild(detailSection);
+
+        container.appendChild(verseCard);
+
+    });
+
+}
+
+
+/*
+=========================================================
+  CREATE WORD TABLE
+=========================================================
+*/
+
+function createWordTable(words) {
+
+    return `
+
+        <table class="word-table">
+
+            <thead>
+
+                <tr>
+                    <th>${ui.wordColumn}</th>
+                    <th>${ui.meaningColumn}</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                ${
+
+                    words.map(word => `
+
+                        <tr>
+
+                            <td>
+                                <span class="sanskrit-word">
+                                    ${word.word}
+                                </span>
+                            </td>
+
+                            <td>
+                                ${word.meaning}
+                            </td>
+
+                        </tr>
+
+                    `).join("")
+
+                }
+
+            </tbody>
+
+        </table>
+
+    `;
+}
+
+
+/*
+=========================================================
+  SHORT VERSE TITLE
+=========================================================
+*/
+
+function getShortTitle(verse) {
+
+    if (verse.title) return verse.title;
+
+    const firstLine = verse.text.split("\n")[0];
+
+    return firstLine.length > 75
+        ? firstLine.substring(0, 75) + "…"
+        : firstLine;
+}
+
+
+/*
+=========================================================
+  SHOW / HIDE (single verse and all verses)
+=========================================================
+*/
+
+function setSimple(section, button, show) {
+
+    section.classList.toggle("visible", show);
+
+    button.textContent = show ? ui.hideSimple : ui.showSimple;
+
+    button.classList.toggle("active", show);
+}
+
+function setDetail(section, button, show) {
+
+    section.classList.toggle("visible", show);
+
+    button.textContent = show ? ui.hideDetail : ui.showDetail;
+
+    button.classList.toggle("active", show);
+}
+
+function setAllSimple(show) {
+
+    document.querySelectorAll(".verse").forEach(verse => {
+
+        const section = verse.querySelector(".simple-section");
+
+        const button = verse.querySelector(".simple-button");
+
+        if (section && button) setSimple(section, button, show);
+
+    });
+}
+
+function setAllDetailed(show) {
+
+    document.querySelectorAll(".verse").forEach(verse => {
+
+        const section = verse.querySelector(".detail-section");
+
+        const button = verse.querySelector(".detail-button");
+
+        if (section && button) setDetail(section, button, show);
+
+    });
+}
+
+function showAllSimple()   { setAllSimple(true); }
+function hideAllSimple()   { setAllSimple(false); }
+function showAllDetailed() { setAllDetailed(true); }
+function hideAllDetailed() { setAllDetailed(false); }
+
+
+/*
+=========================================================
+  INITIALIZE PAGE
+=========================================================
+*/
+
+loadData();
+
+</script>
+
+</body>
+</html>

@@ -216,32 +216,32 @@ button.active {
 
 /* -------------------------------------------------
    INLINE MEANINGS (inside the Original box)
+   Switched per verse with classes on the .verse card:
+     .inline-words-on   word-by-word under every word
+     .inline-simple-on  simple meaning under every line
 ------------------------------------------------- */
 
-.sanskrit .inline-words {
+.inline-line {
     display: none;
 }
 
-body.inline-words-on .sanskrit.has-inline .plain-text {
+.verse.inline-words-on .sanskrit.has-inline .plain-line {
     display: none;
 }
 
-body.inline-words-on .sanskrit.has-inline .inline-words {
-    display: block;
+.verse.inline-words-on .sanskrit.has-inline .inline-line {
+    display: flex;
 }
 
 .inline-line {
-    display: flex;
     flex-wrap: wrap;
     align-items: flex-start;
 
     gap: 4px 20px;
-
-    margin-bottom: 8px;
 }
 
 .inline-line.blank {
-    height: 1em;
+    min-height: 1em;
 }
 
 .inline-unit {
@@ -263,22 +263,28 @@ body.inline-words-on .sanskrit.has-inline .inline-words {
     line-height: 1.4;
 }
 
-.inline-simple {
+.line-block {
+    margin-bottom: 6px;
+}
+
+.line-simple {
     display: none;
-
-    margin-top: 12px;
-    padding-top: 10px;
-
-    border-top: 1px dashed var(--border);
 
     color: var(--muted);
 
     font-size: 16px;
-    line-height: 1.7;
+    line-height: 1.6;
+
+    margin-top: 2px;
+    margin-bottom: 4px;
 }
 
-body.inline-simple-on .inline-simple {
+.verse.inline-simple-on .line-simple {
     display: block;
+}
+
+.verse-buttons .inline-button {
+    border-color: var(--simple-border);
 }
 
 /* -------------------------------------------------
@@ -666,6 +672,8 @@ function renderVerses() {
 
         const hasInline = !!(verse.inline && verse.inline.length);
 
+        const hasInlineSimple = !!(verse.inlineSimple && verse.inlineSimple.length);
+
         originalSection.innerHTML = `
 
             <div class="section-title">
@@ -674,17 +682,25 @@ function renderVerses() {
 
             <div class="sanskrit${hasInline ? " has-inline" : ""}">
 
-                <div class="plain-text">
-                    ${verse.text.replace(/\n/g, "<br>")}
-                </div>
+                ${
 
-                ${hasInline ? createInlineWords(verse.inline) : ""}
+                    verse.text.split("\n").map((line, i) => `
 
-                ${hasSimple ? `
-                    <div class="inline-simple">
-                        ${verse.simple}
-                    </div>
-                ` : ""}
+                        <div class="line-block">
+
+                            <div class="plain-line">${line || "&nbsp;"}</div>
+
+                            ${hasInline ? createInlineLine(verse.inline[i] || []) : ""}
+
+                            ${hasInlineSimple && verse.inlineSimple[i]
+                                ? `<div class="line-simple">${verse.inlineSimple[i]}</div>`
+                                : ""}
+
+                        </div>
+
+                    `).join("")
+
+                }
 
             </div>
 
@@ -791,6 +807,44 @@ function renderVerses() {
             buttons.appendChild(detailButton);
         }
 
+        if (hasInlineSimple) {
+
+            const inlineSimpleButton = document.createElement("button");
+
+            inlineSimpleButton.className = "inline-button inline-simple-button";
+
+            inlineSimpleButton.textContent = ui.showInlineSimple;
+
+            inlineSimpleButton.addEventListener("click", () => {
+
+                setInline(verseCard, "inline-simple-on", inlineSimpleButton,
+                    !verseCard.classList.contains("inline-simple-on"),
+                    ui.showInlineSimple, ui.hideInlineSimple);
+
+            });
+
+            buttons.appendChild(inlineSimpleButton);
+        }
+
+        if (hasInline) {
+
+            const inlineWordsButton = document.createElement("button");
+
+            inlineWordsButton.className = "inline-button inline-words-button";
+
+            inlineWordsButton.textContent = ui.showInlineWords;
+
+            inlineWordsButton.addEventListener("click", () => {
+
+                setInline(verseCard, "inline-words-on", inlineWordsButton,
+                    !verseCard.classList.contains("inline-words-on"),
+                    ui.showInlineWords, ui.hideInlineWords);
+
+            });
+
+            buttons.appendChild(inlineWordsButton);
+        }
+
         if (buttons.children.length) verseCard.appendChild(buttons);
 
         if (simpleSection) verseCard.appendChild(simpleSection);
@@ -863,40 +917,24 @@ function createWordTable(words) {
 =========================================================
 */
 
-function createInlineWords(lines) {
+function createInlineLine(units) {
 
-    return `
+    if (!units.length) return '<div class="inline-line blank"></div>';
 
-        <div class="inline-words">
+    return `<div class="inline-line">${
 
-            ${
+        units.map(unit => `
 
-                lines.map(line => line.length === 0
+            <span class="inline-unit">
+                <span class="inline-word">${unit.t}</span>
+                ${unit.m
+                    ? `<span class="inline-meaning">${unit.m}</span>`
+                    : ""}
+            </span>
 
-                    ? '<div class="inline-line blank"></div>'
+        `).join("")
 
-                    : `<div class="inline-line">${
-
-                        line.map(unit => `
-
-                            <span class="inline-unit">
-                                <span class="inline-word">${unit.t}</span>
-                                ${unit.m
-                                    ? `<span class="inline-meaning">${unit.m}</span>`
-                                    : ""}
-                            </span>
-
-                        `).join("")
-
-                    }</div>`
-
-                ).join("")
-
-            }
-
-        </div>
-
-    `;
+    }</div>`;
 }
 
 
@@ -977,26 +1015,61 @@ function toggleAllDetailed() {
     setAllDetailed(!allVisible(".detail-section"));
 }
 
-function toggleInlineSimple() {
+/*
+ * Inline toggles work per verse (the buttons inside each card) and
+ * globally (the buttons at the top, which drive every verse).
+ */
 
-    document.body.classList.toggle("inline-simple-on");
+function setInline(verseCard, className, button, show, showText, hideText) {
+
+    verseCard.classList.toggle(className, show);
+
+    button.textContent = show ? hideText : showText;
+
+    button.classList.toggle("active", show);
 
     updateGlobalButtons();
 }
 
+function allInline(buttonSelector, className) {
+
+    const buttons = document.querySelectorAll(buttonSelector);
+
+    return buttons.length > 0 &&
+        Array.from(buttons).every(b =>
+            b.closest(".verse").classList.contains(className));
+}
+
+function setAllInline(buttonSelector, className, show, showText, hideText) {
+
+    document.querySelectorAll(buttonSelector).forEach(button => {
+
+        setInline(button.closest(".verse"), className, button, show,
+            showText, hideText);
+
+    });
+}
+
+function toggleInlineSimple() {
+
+    setAllInline(".inline-simple-button", "inline-simple-on",
+        !allInline(".inline-simple-button", "inline-simple-on"),
+        ui.showInlineSimple, ui.hideInlineSimple);
+}
+
 function toggleInlineWords() {
 
-    document.body.classList.toggle("inline-words-on");
-
-    updateGlobalButtons();
+    setAllInline(".inline-words-button", "inline-words-on",
+        !allInline(".inline-words-button", "inline-words-on"),
+        ui.showInlineWords, ui.hideInlineWords);
 }
 
 function updateGlobalButtons() {
 
     const simpleAll = allVisible(".simple-section");
     const detailAll = allVisible(".detail-section");
-    const inlineSimple = document.body.classList.contains("inline-simple-on");
-    const inlineWords = document.body.classList.contains("inline-words-on");
+    const inlineSimple = allInline(".inline-simple-button", "inline-simple-on");
+    const inlineWords = allInline(".inline-words-button", "inline-words-on");
 
     const set = (id, on, onText, offText) => {
 

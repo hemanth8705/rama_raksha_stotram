@@ -180,16 +180,6 @@ button.active {
     white-space: nowrap;
 }
 
-.verse-title {
-    flex: 1;
-
-    font-weight: bold;
-
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
 /* -------------------------------------------------
    ORIGINAL
 ------------------------------------------------- */
@@ -222,6 +212,73 @@ button.active {
     line-height: 2;
 
     margin-bottom: 15px;
+}
+
+/* -------------------------------------------------
+   INLINE MEANINGS (inside the Original box)
+------------------------------------------------- */
+
+.sanskrit .inline-words {
+    display: none;
+}
+
+body.inline-words-on .sanskrit.has-inline .plain-text {
+    display: none;
+}
+
+body.inline-words-on .sanskrit.has-inline .inline-words {
+    display: block;
+}
+
+.inline-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+
+    gap: 4px 20px;
+
+    margin-bottom: 8px;
+}
+
+.inline-line.blank {
+    height: 1em;
+}
+
+.inline-unit {
+    display: inline-flex;
+    flex-direction: column;
+
+    max-width: 12em;
+}
+
+.inline-word {
+    line-height: 1.6;
+}
+
+.inline-meaning {
+    color: var(--muted);
+
+    font-size: 13px;
+    font-weight: normal;
+    line-height: 1.4;
+}
+
+.inline-simple {
+    display: none;
+
+    margin-top: 12px;
+    padding-top: 10px;
+
+    border-top: 1px dashed var(--border);
+
+    color: var(--muted);
+
+    font-size: 16px;
+    line-height: 1.7;
+}
+
+body.inline-simple-on .inline-simple {
+    display: block;
 }
 
 /* -------------------------------------------------
@@ -349,18 +406,16 @@ footer {
 
 @media (max-width: 650px) {
 
-    .verse-header {
-        flex-direction: column;
-
-        align-items: flex-start;
-    }
-
-    .verse-title {
-        white-space: normal;
-    }
-
     .sanskrit {
         font-size: 18px;
+    }
+
+    .inline-unit {
+        max-width: 9em;
+    }
+
+    .inline-line {
+        gap: 4px 14px;
     }
 
     .word-table,
@@ -421,13 +476,13 @@ footer {
 
 <div class="global-controls">
 
-    <button id="btn-show-simple" onclick="showAllSimple()"></button>
+    <button id="btn-toggle-simple" onclick="toggleAllSimple()"></button>
 
-    <button id="btn-hide-simple" onclick="hideAllSimple()"></button>
+    <button id="btn-toggle-detailed" onclick="toggleAllDetailed()"></button>
 
-    <button id="btn-show-detailed" onclick="showAllDetailed()"></button>
+    <button id="btn-inline-simple" onclick="toggleInlineSimple()"></button>
 
-    <button id="btn-hide-detailed" onclick="hideAllDetailed()"></button>
+    <button id="btn-inline-words" onclick="toggleInlineWords()"></button>
 
 </div>
 
@@ -546,10 +601,6 @@ function renderPage(meta) {
 
     document.getElementById("page-subtitle").textContent = meta.subtitle || "";
 
-    document.getElementById("btn-show-simple").textContent = ui.showAllSimple;
-    document.getElementById("btn-hide-simple").textContent = ui.hideAllSimple;
-    document.getElementById("btn-show-detailed").textContent = ui.showAllDetailed;
-    document.getElementById("btn-hide-detailed").textContent = ui.hideAllDetailed;
 
     document.getElementById("page-footer").innerHTML =
         (meta.footer || []).map(line => "<div>" + line + "</div>").join("");
@@ -557,6 +608,8 @@ function renderPage(meta) {
     applyTheme(document.documentElement.getAttribute("data-theme"));
 
     renderVerses();
+
+    updateGlobalButtons();
 }
 
 
@@ -600,10 +653,6 @@ function renderVerses() {
                 }
             </span>
 
-            <span class="verse-title">
-                ${getShortTitle(verse)}
-            </span>
-
         `;
 
 
@@ -615,14 +664,28 @@ function renderVerses() {
 
         originalSection.className = "original-section";
 
+        const hasInline = !!(verse.inline && verse.inline.length);
+
         originalSection.innerHTML = `
 
             <div class="section-title">
                 ${ui.originalTitle}
             </div>
 
-            <div class="sanskrit">
-                ${verse.text.replace(/\n/g, "<br>")}
+            <div class="sanskrit${hasInline ? " has-inline" : ""}">
+
+                <div class="plain-text">
+                    ${verse.text.replace(/\n/g, "<br>")}
+                </div>
+
+                ${hasInline ? createInlineWords(verse.inline) : ""}
+
+                ${hasSimple ? `
+                    <div class="inline-simple">
+                        ${verse.simple}
+                    </div>
+                ` : ""}
+
             </div>
 
         `;
@@ -796,19 +859,44 @@ function createWordTable(words) {
 
 /*
 =========================================================
-  SHORT VERSE TITLE
+  INLINE WORD-BY-WORD (shown inside the Original box)
 =========================================================
 */
 
-function getShortTitle(verse) {
+function createInlineWords(lines) {
 
-    if (verse.title) return verse.title;
+    return `
 
-    const firstLine = verse.text.split("\n")[0];
+        <div class="inline-words">
 
-    return firstLine.length > 75
-        ? firstLine.substring(0, 75) + "…"
-        : firstLine;
+            ${
+
+                lines.map(line => line.length === 0
+
+                    ? '<div class="inline-line blank"></div>'
+
+                    : `<div class="inline-line">${
+
+                        line.map(unit => `
+
+                            <span class="inline-unit">
+                                <span class="inline-word">${unit.t}</span>
+                                ${unit.m
+                                    ? `<span class="inline-meaning">${unit.m}</span>`
+                                    : ""}
+                            </span>
+
+                        `).join("")
+
+                    }</div>`
+
+                ).join("")
+
+            }
+
+        </div>
+
+    `;
 }
 
 
@@ -825,6 +913,8 @@ function setSimple(section, button, show) {
     button.textContent = show ? ui.hideSimple : ui.showSimple;
 
     button.classList.toggle("active", show);
+
+    updateGlobalButtons();
 }
 
 function setDetail(section, button, show) {
@@ -834,6 +924,8 @@ function setDetail(section, button, show) {
     button.textContent = show ? ui.hideDetail : ui.showDetail;
 
     button.classList.toggle("active", show);
+
+    updateGlobalButtons();
 }
 
 function setAllSimple(show) {
@@ -862,10 +954,64 @@ function setAllDetailed(show) {
     });
 }
 
-function showAllSimple()   { setAllSimple(true); }
-function hideAllSimple()   { setAllSimple(false); }
-function showAllDetailed() { setAllDetailed(true); }
-function hideAllDetailed() { setAllDetailed(false); }
+/*
+ * Global toggles: if every verse already shows the section, hide
+ * them all; otherwise show them all.
+ */
+
+function allVisible(selector) {
+
+    const sections = document.querySelectorAll(selector);
+
+    return sections.length > 0 &&
+        Array.from(sections).every(s => s.classList.contains("visible"));
+}
+
+function toggleAllSimple() {
+
+    setAllSimple(!allVisible(".simple-section"));
+}
+
+function toggleAllDetailed() {
+
+    setAllDetailed(!allVisible(".detail-section"));
+}
+
+function toggleInlineSimple() {
+
+    document.body.classList.toggle("inline-simple-on");
+
+    updateGlobalButtons();
+}
+
+function toggleInlineWords() {
+
+    document.body.classList.toggle("inline-words-on");
+
+    updateGlobalButtons();
+}
+
+function updateGlobalButtons() {
+
+    const simpleAll = allVisible(".simple-section");
+    const detailAll = allVisible(".detail-section");
+    const inlineSimple = document.body.classList.contains("inline-simple-on");
+    const inlineWords = document.body.classList.contains("inline-words-on");
+
+    const set = (id, on, onText, offText) => {
+
+        const button = document.getElementById(id);
+
+        button.textContent = on ? onText : offText;
+
+        button.classList.toggle("active", on);
+    };
+
+    set("btn-toggle-simple", simpleAll, ui.hideAllSimple, ui.showAllSimple);
+    set("btn-toggle-detailed", detailAll, ui.hideAllDetailed, ui.showAllDetailed);
+    set("btn-inline-simple", inlineSimple, ui.hideInlineSimple, ui.showInlineSimple);
+    set("btn-inline-words", inlineWords, ui.hideInlineWords, ui.showInlineWords);
+}
 
 
 /*
